@@ -38,6 +38,38 @@
     </au:assertTrue>
   </target>
 
+  <target name="test-selector">
+    <!-- Prepare input files -->
+    <mkdir dir="${input}" />
+    <echo file="${input}/test1.txt" message="abc" />
+    <echo file="${input}/test2.txt" message="def" />
+    <zip destFile="${input}/test.zip">
+      <fileset dir="${input}" includes="*.txt" />
+    </zip>
+
+    <!-- Confirm that selector in standard fileset is executed -->
+    <mkdir dir="${output}/o1" />
+    <copy toDir="${output}/o1">
+      <fileset dir="${input}" includes="*.txt">
+        <contains text="def" />
+      </fileset>
+    </copy>
+    <au:assertFalse>
+      <available file="${output}/o1/test1.txt"/>
+    </au:assertFalse>
+
+    <!-- And not executed in Zipfileset -->
+    <mkdir dir="${output}/o2" />
+    <copy toDir="${output}/o2">
+      <zipfileset src="${input}/test.zip">
+        <contains text="def" />
+      </zipfileset>
+    </copy>
+    <au:assertFalse>
+      <available file="${output}/o2/test1.txt"/>
+    </au:assertFalse>
+  </target>
+
   <target name="test-refid-check-prefix">
     <zipfileset id="test-refid"
                 dir="${basedir}"/>
